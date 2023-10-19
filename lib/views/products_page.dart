@@ -1,73 +1,95 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx/controllers/cart_controller.dart';
-import 'package:getx/models/product_items.dart';
 
 import '../controllers/products_controler.dart';
 
 class ProductsPage extends StatelessWidget {
   ProductsPage({super.key});
-  final controller = Get.put(ProductControler());
-  final cartcontroller = Get.put(CartControler());
+  final shoppingController = Get.put(ProductControler());
+  final cartController = Get.put(CartControler());
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          GetX<ProductControler>(
-            builder: (controller) {
-              return ListView.builder(
-                itemCount: controller.items.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: GetX<ProductControler>(
+                builder: (shoppingController) {
+                  return ListView.builder(
+                    itemCount: shoppingController.items.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        margin: const EdgeInsets.all(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              GetX<ProductControler>(builder: (controller) {
-                                return Text(
-                                    '${controller.items[index].id}');
-                              }),
-                              GetX<ProductControler>(builder: (controller) {
-                                return Text(
-                                    '${controller.items[index].price}');
-                              }),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              GetX<ProductControler>(builder: (controller) {
-                                return Text(
-                                    '\$${controller.items[index].name}');
-                              }),
-                              ElevatedButton(
-                                onPressed: cartcontroller
-                                    .addtocart(controller.items[index]),
-                                child: Text('Add to cart'),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${shoppingController.items[index].id}',
+                                        style: TextStyle(fontSize: 24),
+                                      ),
+                                      Text(
+                                          '${shoppingController.items[index].name}'),
+                                    ],
+                                  ),
+                                  Text('\$${shoppingController.items[index].price}',
+                                      style: TextStyle(fontSize: 24)),
+                                ],
                               ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  cartController
+                                      .addtocart(shoppingController.items[index]);
+                                },
+                                
+                                child: Text('Add to Cart'),
+                              ),
+                              
                             ],
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   );
                 },
+              ),
+            ),
+            GetX<CartControler>(builder: (controller) {
+              return Text(
+                'Total amount: \$ ${controller.totalPrice}',
+                style: TextStyle(fontSize: 25, color: Colors.black),
               );
-            },
-          ),
-         GetX<ProductControler>(
-           builder: (CartControler) {
-             return FloatingActionButton.extended(onPressed: (){}, icon: Icon(Icons.shopping_cart), label: Text('$cartcontroller.count'));
-           }
-         )
-        ],
-        
-
+            }),
+            SizedBox(height: 100),
+          ],
+        ),
       ),
-      
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {},
+        backgroundColor: Colors.amber,
+        icon: Icon(
+          Icons.add_shopping_cart_rounded,
+          color: Colors.black,
+        ),
+        label: GetX<CartControler>(builder: (controller) {
+          return Text(
+            controller.count.toString(),
+            style: TextStyle(color: Colors.black, fontSize: 24),
+          );
+        }),
+      ),
     );
   }
 }
